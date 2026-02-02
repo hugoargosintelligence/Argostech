@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="google-site-verification" content="QXXDAMc_zbXi6VhJLjnfSG59AYq6PdPY1E7Ui4WkNo0" />
+    <meta name="msvalidate.01" content="AQUI_TU_CODIGO_DE_BING" /> 
+
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NMGBZWDS');</script>
+
+    <title>ARGOS | Software IA para Mantenimiento Industrial y SAT (GMAO Inteligente)</title>
+    <meta name="description" content="Reduce un 30% el tiempo de reparación (MTTR). Argos es el asistente IA que digitaliza manuales técnicos y asiste a operarios en campo sin papeleo.">
+    <meta name="keywords" content="software mantenimiento industrial, inteligencia artificial sat, reducir mttr, gmao ia, digitalización manuales técnicos, argos fsm">
+    <meta name="author" content="Argos Intelligence">
+    <link rel="canonical" href="https://argostech.es/">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <meta property="og:title" content="ARGOS | Tu Cerebro Digital para Mantenimiento">
+    <meta property="og:description" content="Tus técnicos pierden horas buscando información. Argos les da la respuesta exacta en segundos.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://argostech.es/">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "ARGOS Intelligence",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Cloud/Web, iOS, Android",
+          "description": "Plataforma de IA Visual y Conversacional para reducir el MTTR en empresas de mantenimiento industrial.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR",
+            "description": "Auditoría de eficiencia inicial gratuita"
+          },
+          "author": {
+              "@type": "Organization",
+              "name": "Argos FSM",
+              "url": "https://argostech.es" 
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Cómo reduce Argos el tiempo de inactividad?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Argos reduce el downtime proporcionando a los técnicos acceso instantáneo a esquemas mediante reconocimiento de imagen y voz."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* --- SISTEMA DE DISEÑO --- */
+        :root {
+            --bg-dark: #020617;
+            --bg-light: #FFFFFF;
+            --bg-gray: #F8FAFC;
+            
+            --primary: #2563EB;
+            --primary-dark: #1D4ED8;
+            --accent: #06B6D4;
+            --danger: #EF4444;
+            --success: #10B981;
+            
+            --text-dark: #0F172A;
+            --text-gray: #64748B;
+            
+            --shadow-float: 0 20px 40px -5px rgba(15, 23, 42, 0.1);
+            --border-light: 1px solid #E2E8F0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body {
+            background-color: var(--bg-light); color: var(--text-dark);
+            font-family: 'Inter', sans-serif; line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; line-height: 1.1; color: var(--text-dark); }
+        strong { font-weight: 700; }
+        a { text-decoration: none; transition: 0.3s; }
+        img { max-width: 100%; height: auto; display: block; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 2; }
+
+        /* BOTONES */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; padding: 12px 28px;
+            border-radius: 10px; font-weight: 600; border: none; cursor: pointer; font-size: 1rem;
+            transition: all 0.3s ease; gap: 8px; white-space: nowrap;
+        }
+        .btn-primary { 
+            background: var(--primary); color: white; 
+            box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.4);
+        }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1); color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
+
+        /* NAVEGACIÓN */
+        nav { 
+            position: sticky; top: 0; z-index: 1000; 
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+            border-bottom: var(--border-light); padding: 12px 0;
+        }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--bg-dark); display: flex; align-items: center; gap: 8px; letter-spacing: -1px;}
+        
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a.link { color: var(--text-gray); font-weight: 500; font-size: 0.95rem; }
+        .nav-links a.link:hover { color: var(--primary); }
+
+        /* HERO SECTION (MODIFICADO ESCRITORIO) */
+        .hero { 
+            background: var(--bg-dark); 
+            /* AQUÍ ESTABA EL PROBLEMA EN ESCRITORIO: Aumentamos padding-top a 140px */
+            padding: 80px 0 140px 0; 
+            color: white; 
+            position: relative; 
+            overflow: hidden;
+            background: linear-gradient(135deg, #020617 0%, #0F172A 100%);
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -50%; right: -10%; width: 900px; height: 900px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 70%); pointer-events: none;
+        }
+        .hero-grid { 
+            display: grid; 
+            grid-template-columns: 1.1fr 0.9fr; 
+            gap: 50px; 
+            align-items: center; 
+            position: relative; 
+            z-index: 2; 
+        }
+        .hero h1 { 
+            font-size: 4rem; 
+            margin-bottom: 20px; 
+            color: white; 
+            line-height: 1.05;
+        }
+        .hero h1 span { color: var(--accent); background: linear-gradient(to right, var(--accent), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { 
+            font-size: 1.3rem; 
+            color: #CBD5E1; 
+            margin-bottom: 35px; 
+            max-width: 600px; 
+        }
+
+        /* PHONE MOCKUP */
+        .phone-mockup {
+            width: 100%; 
+            max-width: 360px;
+            height: 720px;
+            background: #FFFFFF;
+            border: 14px solid #334155; border-radius: 50px;
+            margin: 0 auto; position: relative; overflow: hidden;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.1), 0 50px 120px -20px rgba(37, 99, 235, 0.4);
+            /* Modificado: Positive translateY(10px) para bajarlo un poco */
+            transform: rotate(-2deg) translateY(10px);
+            transition: transform 0.5s;
+        }
+        .phone-mockup:hover { transform: rotate(0deg) translateY(10px); }
+        .screen-ui { height: 100%; background: #F8FAFC; padding: 20px; display: flex; flex-direction: column; }
+        
+        .chat-bubble { padding: 14px 16px; border-radius: 16px; font-size: 0.85rem; margin-bottom: 15px; max-width: 90%; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .bubble-audio { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; display: flex; align-items: center; gap: 10px; min-width: 180px; }
+        .bubble-text { align-self: flex-start; background: white; color: var(--text-dark); border-bottom-left-radius: 4px; border: 1px solid #E2E8F0; }
+        
+        .ai-card { background: white; border-radius: 12px; padding: 12px; margin-bottom: 15px; border: 1px solid #E2E8F0; display: flex; gap: 10px; align-items: center; }
+        .ai-icon-box { width: 40px; height: 40px; background: #EFF6FF; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
+        
+        .scan-btn-mockup { 
+            margin-top: auto; background: var(--text-dark); color: white; border-radius: 50px; 
+            padding: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; 
+            font-weight: 600; font-size: 0.9rem; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            position: relative; overflow: hidden;
+        }
+        .scan-btn-mockup::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.1); animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.5; } 50% { transform: scale(1); opacity: 0; } 100% { transform: scale(0.95); opacity: 0.5; } }
+
+        /* SECCIONES GENERALES */
+        .section-values { padding: 80px 0; background: white; position: relative; z-index: 10; margin-top: -80px; }
+        .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; background: white; padding: 50px; border-radius: 24px; box-shadow: 0 30px 60px -15px rgba(0,0,0,0.1); border: 1px solid var(--border-light); }
+        .value-card { text-align: left; padding: 10px; }
+        .value-icon { font-size: 2rem; color: var(--primary); margin-bottom: 18px; background: #EFF6FF; padding: 14px; border-radius: 14px; display: inline-block; }
+        .value-title { font-size: 1.2rem; margin-bottom: 10px; color: var(--text-dark); font-weight: 800; }
+        .value-desc { font-size: 1rem; color: var(--text-gray); line-height: 1.6; }
+
+        .section-pain { padding: 100px 0; background: var(--bg-gray); }
+        .pain-header { text-align: center; max-width: 700px; margin: 0 auto 60px auto; }
+        .pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .pain-card { background: white; padding: 40px; border-radius: 20px; text-align: center; border: 1px solid var(--border-light); transition: 0.3s; }
+        .pain-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-float); border-color: var(--danger); }
+        .pain-stat { font-size: 3rem; font-weight: 800; color: var(--danger); display: block; margin-bottom: 10px; line-height: 1; }
+
+        /* --- PESTAÑAS (Estilo Premium) --- */
+        .section-tabs { padding: 100px 0; background: #F8FAFC; }
+        .tabs-header { text-align: center; max-width: 700px; margin: 0 auto 50px auto; }
+        .tabs-container { display: flex; justify-content: center; margin-bottom: -30px; position: relative; z-index: 10; }
+        .sliding-tabs { position: relative; display: inline-flex; background: white; border-radius: 100px; padding: 6px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); border: 1px solid #E2E8F0; }
+        .tab-btn { position: relative; z-index: 2; background: transparent; border: none; padding: 12px 30px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem; color: #64748B; cursor: pointer; transition: color 0.3s ease; outline: none; white-space: nowrap; }
+        .tab-btn.active { color: white; }
+        .tab-glider { position: absolute; top: 6px; left: 6px; height: calc(100% - 12px); background: var(--text-dark); border-radius: 40px; z-index: 1; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        .tabs-content-wrapper { position: relative; min-height: 600px; }
+        .tab-content { display: none; opacity: 0; animation: fadeUp 0.5s ease forwards; }
+        .tab-content.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-card-container { background: white; border-radius: 24px; padding: 70px 60px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1); border: 1px solid #E2E8F0; display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; }
+        .role-badge { display: inline-block; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; margin-bottom: 25px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .rb-tech { background: #EFF6FF; color: var(--primary); }
+        .rb-manager { background: #ECFEFF; color: var(--accent); }
+        .rb-director { background: #F1F5F9; color: var(--text-dark); }
+        .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 45px; }
+        .feat-box { background: #F8FAFC; padding: 25px; border-radius: 14px; border: 1px solid #E2E8F0; transition: 0.2s; }
+        .feat-box:hover { background: white; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.08); transform: translateY(-3px); border-color: var(--primary); }
+        .feat-icon { font-size: 1.6rem; color: var(--text-dark); margin-bottom: 12px; }
+        .feat-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; display: block; }
+        .feat-desc { font-size: 0.9rem; color: #64748B; line-height: 1.5; }
+        .tab-img-frame { position: relative; border-radius: 24px; overflow: hidden; box-shadow: 0 30px 60px -15px rgba(0,0,0,0.2); aspect-ratio: 4/3; background: #F1F5F9; border: 1px solid #E2E8F0; }
+        .tab-img-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- CONTROL ROOM --- */
+        .section-control { background: var(--bg-dark); padding: 100px 0; color: white; overflow: hidden; }
+        .control-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 80px; align-items: center; }
+        .text-gradient { background: linear-gradient(to right, #60A5FA, #2DD4BF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(45, 212, 191, 0.3); }
+        .dash-window { background: #0F172A; border: 1px solid #334155; border-radius: 16px; box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; position: relative; font-family: 'Inter', sans-serif; }
+        .dw-header { background: #1E293B; padding: 15px 20px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        .dw-dots { display: flex; gap: 6px; }
+        .dw-dot { width: 10px; height: 10px; border-radius: 50%; background: #475569; }
+        .dw-body { padding: 25px; display: grid; gap: 20px; }
+        .dw-kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .dw-kpi { background: #1E293B; padding: 15px; border-radius: 10px; border: 1px solid #334155; }
+        .dw-lbl { font-size: 0.7rem; color: #94A3B8; text-transform: uppercase; margin-bottom: 5px; }
+        .dw-val { font-size: 1.4rem; font-weight: 700; color: white; }
+        .dw-list { background: #1E293B; border-radius: 10px; border: 1px solid #334155; overflow: hidden; }
+        .dw-item { padding: 12px 15px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; font-size: 0.85rem; color: #CBD5E1; }
+        .dw-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; background: rgba(16, 185, 129, 0.2); color: #34D399; }
+
+        /* CASO */
+        .section-case { padding: 100px 0; background: white; }
+        .case-container { max-width: 900px; margin: 0 auto; display: flex; background: #0F172A; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-float); }
+        .case-left { flex: 0.7; padding: 50px; background: #172033; color: white; border-right: 1px solid rgba(255,255,255,0.1); }
+        .case-right { flex: 1.3; padding: 50px; background: white; display: flex; flex-direction: column; justify-content: center; }
+        .case-stat-big { font-size: 3rem; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 5px; }
+
+        /* CONTACTO */
+        .section-contact { padding: 100px 0; background: var(--bg-dark); color: white; }
+        .contact-box { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        
+        .contact-info h2 { 
+            font-size: 3.5rem; 
+            line-height: 1.1; 
+            margin-bottom: 25px; 
+            color: var(--accent);
+        }
+        .contact-info p.lead-text { 
+            font-size: 1.5rem; 
+            color: #CBD5E1; 
+            margin-bottom: 40px; 
+            line-height: 1.5;
+        }
+        
+        .section-contact .check-list li { color: rgba(255,255,255,0.9); margin-bottom: 15px; font-weight: 500; display: flex; gap: 12px; align-items: center; font-size: 1.1rem; }
+        .form-wrapper { background: white; padding: 40px; border-radius: 24px; color: var(--text-dark); box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+        .input-ui { width: 100%; padding: 14px; border: 1px solid #CBD5E1; border-radius: 10px; margin-bottom: 15px; font-size: 1rem; background: #F8FAFC; }
+        footer { background: #020617; color: #475569; padding: 40px 0; text-align: center; font-size: 0.9rem; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* COOKIES & RESPONSIVE */
+        #cookie-banner button { transition: 0.3s; }
+        #cookie-banner button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* --- RESPONSIVE OPTIMIZADO PARA MÓVIL --- */
+        @media (max-width: 900px) {
+            /* 1. Ajustes generales de espaciado */
+            .hero, .section-pain, .section-case, .section-contact, .section-tabs, .section-control { 
+                padding: 60px 0; 
+            }
+            
+            .container { padding: 0 20px; }
+            
+            /* Grids a una sola columna */
+            .hero-grid, .values-grid, .pain-grid, .contact-box, .control-grid, .tab-card-container { 
+                grid-template-columns: 1fr; 
+                gap: 30px; 
+            }
+            
+            /* 2. NAVEGACIÓN MÓVIL */
+            .nav-links { display: flex; gap: 12px; align-items: center; }
+            .nav-links .link, .nav-links div { display: none; }
+            
+            /* CAMBIO AQUI: Selector CSS actualizado para app.html */
+            .nav-links a[href="app.html"] { display: flex; font-size: 0; color: var(--primary); background: #EFF6FF; padding: 8px; border-radius: 50%; }
+            .nav-links a[href="app.html"] i { font-size: 1.4rem; }
+            
+            .nav-links .btn { padding: 8px 14px; font-size: 0.85rem; margin: 0; }
+
+            /* 3. HERO (ARREGLO DE ALTURA MÓVIL) */
+            .hero { 
+                /* Mantenemos el ajuste móvil que funcionó */
+                padding-top: 150px; 
+                padding-bottom: 60px; 
+                text-align: center; 
+            }
+            .hero h1 { font-size: 2.5rem; line-height: 1.1; margin-bottom: 15px; }
+            .hero p { font-size: 1.1rem; margin-bottom: 25px; }
+            
+            /* Ajuste de botones en móvil para que estén centrados */
+            .hero-grid > div:first-child div[style*="display: flex"] {
+                justify-content: center;
+                margin-bottom: 0px; 
+            }
+
+            /* 4. MOCKUP DE TELÉFONO EN MÓVIL */
+            .phone-mockup { 
+                /* Mantenemos el margen superior extra en móvil */
+                margin: 60px auto 0 auto; 
+                max-width: 280px; 
+                height: 500px; 
+                transform: rotate(0deg) !important; 
+                border-width: 10px;
+            }
+            
+            /* 5. SECCIÓN VALORES */
+            .section-values {
+                padding-top: 40px;
+                margin-top: 0; 
+                background: white; 
+            }
+            .values-grid {
+                gap: 20px;
+                padding: 25px 20px;
+                box-shadow: none;
+                border: 1px solid var(--border-light);
+            }
+            
+            /* Ajustes Tabs Móvil */
+            .sliding-tabs { width: 100%; display: flex; justify-content: space-between; margin-bottom: 20px;}
+            .tab-btn { flex: 1; padding: 10px 0; font-size: 0.75rem; }
+            .tab-img-frame { order: -1; aspect-ratio: 16/9; margin-bottom: 20px; }
+            .features-grid { grid-template-columns: 1fr; gap: 15px; margin-top: 20px; }
+            .tab-card-container { padding: 25px 20px; gap: 10px; }
+            .tabs-content-wrapper { min-height: auto; }
+
+            /* Control Room */
+            .dash-window { margin: 0; }
+            .dw-kpi-row { gap: 10px; }
+            .dw-val { font-size: 1.2rem; }
+
+            /* Caso de Éxito */
+            .case-container { flex-direction: column; }
+            .case-left, .case-right { padding: 30px 20px; text-align: center; }
+            .case-right { align-items: center; }
+            
+            /* Contacto */
+            .contact-info h2 { font-size: 2.2rem; text-align: center; }
+            .contact-info p.lead-text { font-size: 1.1rem; text-align: center; }
+            .check-list { align-items: flex-start; margin-bottom: 30px; }
+            .form-wrapper { padding: 25px; margin-top: 20px;}
+            
+            /* Footer y Cookies */
+            #cookie-banner { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
+            #cookie-banner p { max-width: 100%; }
+            footer .container { flex-direction: column; gap: 20px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NMGBZWDS"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <nav>
+        <div class="container nav-container">
+            <div class="nav-logo"><i class="ph-fill ph-eye"></i> ARGOS</div>
+            <div class="nav-links">
+                <a href="#problema" class="link">El Problema</a>
+                <a href="#solucion" class="link">Solución IA</a>
+                <a href="#casos" class="link">Resultados</a>
+                <a href="/blog.html" class="link">Blog</a>
+                <div style="width: 1px; height: 24px; background: #E2E8F0; margin: 0 10px; display: inline-block;"></div>
+                <a href="app.html" class="link" style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-dark);">
+                    <i class="ph-bold ph-user-circle" style="font-size: 1.2rem;"></i> Acceso Clientes
+                </a>
+                <a href="#contacto" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.9rem; margin-left: 10px;">Auditoría</a>
+            </div>
+        </div>
+    </nav>
+    
+    <section class="hero" id="problema">
+        <div class="container hero-grid">
+            <div>
+                <div style="display: inline-block; padding: 8px 16px; background: rgba(255,255,255,0.08); color: var(--accent); border-radius: 50px; font-size: 0.85rem; font-weight: 700; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.15); letter-spacing: 0.5px;">
+                    IA PARA MANTENIMIENTO Y SAT
+                </div>
+                <h1>El coste oculto en tu <br><span>Mantenimiento Industrial.</span></h1>
+                <p>Tus técnicos pierden el 30% de su jornada buscando información en manuales. Argos es el cerebro digital que elimina esa ineficiencia y acelera el MTTR.</p>
+                
+                <div style="display: flex; gap: 15px;">
+                    <a href="#contacto" class="btn btn-primary">Detener la pérdida</a>
+                    <a href="#solucion" class="btn btn-secondary">Ver cómo funciona</a>
+                </div>
+            </div>
+            
+            <div class="phone-mockup">
+                <div class="screen-ui">
+                    <div class="app-header">
+                        <div class="app-time">09:41</div>
+                        <div class="app-status">En línea</div>
+                    </div>
+                    <div style="font-size: 0.7rem; color: var(--text-gray); margin: 10px 0 5px 5px;">Operario · Hace 2 min</div>
+                    <div class="chat-bubble bubble-audio">
+                        <i class="ph-fill ph-play-circle" style="font-size: 24px;"></i>
+                        <div style="height: 4px; width: 80px; background: rgba(255,255,255,0.5); border-radius: 2px;"></div>
+                    </div>
+                    <div style="font-size: 0.7rem; color: var(--text-gray); margin: 15px 0 5px 5px; text-align: right;">Argos IA</div>
+                    <div class="chat-bubble bubble-text" style="margin-left: auto;">
+                        Entendido. El código <strong>E-54</strong> en variador Siemens indica sobrecalentamiento del módulo de potencia.
+                    </div>
+                    <div class="ai-card">
+                        <div class="ai-icon-box"><i class="ph-bold ph-file-text"></i></div>
+                        <div style="flex:1;">
+                            <div style="font-size:0.8rem; font-weight:700;">Manual Servicio V2.pdf</div>
+                            <div style="font-size:0.7rem; color:#64748B;">Página 42 - Esquema Eléctrico</div>
+                        </div>
+                        <i class="ph-bold ph-caret-right" style="color:#CBD5E1;"></i>
+                    </div>
+                    <div class="scan-btn-mockup">
+                        <i class="ph-bold ph-scan"></i> Escanear Componente
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-values">
+        <div class="container values-grid">
+            <div class="value-card">
+                <div class="value-icon"><i class="ph-duotone ph-lightning"></i></div>
+                <h3 class="value-title">Respuesta en Segundos</h3>
+                <p class="value-desc">Tus técnicos no esperan. Envían una foto o audio y reciben la solución exacta al instante, sin buscar en archivadores.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="ph-duotone ph-brain"></i></div>
+                <h3 class="value-title">Cero Entrenamiento</h3>
+                <p class="value-desc">Interfaz similar a WhatsApp. Si saben enviar un mensaje de voz, saben usar Argos desde el primer minuto.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="ph-duotone ph-chart-line-up"></i></div>
+                <h3 class="value-title">Control Total</h3>
+                <p class="value-desc">Detecta qué máquinas fallan más y dónde le falta formación a tu equipo en tiempo real con datos reales.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-pain">
+        <div class="container">
+            <div class="pain-header">
+                <h2>La ineficiencia es silenciosa,<br>pero muy cara.</h2>
+            </div>
+            <div class="pain-grid">
+                <div class="pain-card">
+                    <span class="pain-stat">15h</span>
+                    <p style="color: var(--text-gray); font-weight: 500;">Perdidas a la semana por técnicos senior atendiendo llamadas y dudas internas.</p>
+                </div>
+                <div class="pain-card">
+                    <span class="pain-stat">18k€</span>
+                    <p style="color: var(--text-gray); font-weight: 500;">Coste anual directo de horas no productivas buscando información en equipos medianos.</p>
+                </div>
+                <div class="pain-card">
+                    <span class="pain-stat">+40%</span>
+                    <p style="color: var(--text-gray); font-weight: 500;">De aumento en el Tiempo Medio de Reparación (MTTR) por falta de datos al instante.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-tabs">
+        <div class="container">
+            <div class="tabs-header">
+                <h2 style="margin-bottom: 15px; font-size: 2.5rem;">Potencia para <span class="text-gradient">cada rol.</span></h2>
+                <p style="color: var(--text-gray); font-size: 1.15rem;">Argos no es una talla única. La interfaz se adapta dinámicamente a las necesidades de cada miembro de tu equipo.</p>
+            </div>
+
+            <div class="tabs-container">
+                <div class="sliding-tabs">
+                    <div class="tab-glider" id="glider"></div>
+                    <button class="tab-btn active" onclick="switchTab(event, 'tab-1')">Técnico de Campo</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-2')">Gerente de Planta</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'tab-3')">Director Operativo</button>
+                </div>
+            </div>
+
+            <div class="tabs-content-wrapper">
+                
+                <div id="tab-1" class="tab-content active">
+                    <div class="tab-card-container">
+                        <div>
+                            <span class="role-badge rb-tech">En la trinchera</span>
+                            <h3 style="margin-bottom: 25px; font-size: 2.2rem; line-height: 1.1;">Deja de leer manuales. <br>Empieza a arreglar.</h3>
+                            <p style="color: #64748B; font-size: 1.1rem; margin-bottom: 35px;">Nadie quiere hacer scroll en un PDF de 300 páginas en una pantalla de 6 pulgadas. Argos digiere toda la documentación técnica y le entrega al operario la respuesta precisa al pie de máquina.</p>
+                            
+                            <div class="features-grid">
+                                <div class="feat-box">
+                                    <i class="ph-fill ph-magnifying-glass feat-icon" style="color: var(--primary);"></i>
+                                    <span class="feat-title">Cero Búsquedas</span>
+                                    <span class="feat-desc">Identificación visual de componentes y acceso directo al esquema eléctrico relevante.</span>
+                                </div>
+                                <div class="feat-box">
+                                    <i class="ph-fill ph-file-text feat-icon" style="color: var(--primary);"></i>
+                                    <span class="feat-title">Reportes Automáticos</span>
+                                    <span class="feat-desc">El técnico habla, Argos escribe. Órdenes de trabajo cerradas antes de quitarse los guantes.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-img-frame">
+                            <img src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=1200&auto=format&fit=crop" alt="Técnico industrial usando tablet en fábrica">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-2" class="tab-content">
+                    <div class="tab-card-container">
+                        <div>
+                            <span class="role-badge rb-manager">Torre de Control</span>
+                            <h3 style="margin-bottom: 25px; font-size: 2.2rem; line-height: 1.1;">Orquestación total <br>de la planta.</h3>
+                            <p style="color: #64748B; font-size: 1.1rem; margin-bottom: 35px;">Olvídate de perseguir a los técnicos por teléfono. Asigna órdenes, valida trabajos y gestiona el inventario desde un panel unificado.</p>
+                            
+                            <div class="features-grid">
+                                <div class="feat-box">
+                                    <i class="ph-fill ph-users-three feat-icon" style="color: var(--accent);"></i>
+                                    <span class="feat-title">Asignación IA</span>
+                                    <span class="feat-desc">Sugiere el mejor técnico según cercanía, carga de trabajo y skill.</span>
+                                </div>
+                                <div class="feat-box">
+                                    <i class="ph-fill ph-bell-ringing feat-icon" style="color: var(--accent);"></i>
+                                    <span class="feat-title">Alertas de Stock</span>
+                                    <span class="feat-desc">Aviso automático predictivo antes de que falten repuestos críticos.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-img-frame">
+                            <img src="https://images.unsplash.com/photo-1664575602554-2087b04935a5?q=80&w=1200&auto=format&fit=crop" alt="Panel de Gestión de Mantenimiento">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-3" class="tab-content">
+                    <div class="tab-card-container">
+                        <div>
+                            <span class="role-badge rb-director">Visión de Negocio</span>
+                            <h3 style="margin-bottom: 25px; font-size: 2.2rem; line-height: 1.1;">Del mantenimiento <br>a la rentabilidad.</h3>
+                            <p style="color: #64748B; font-size: 1.1rem; margin-bottom: 35px;">Transforma el departamento de un centro de costes a una ventaja competitiva con datos predictivos de alto nivel.</p>
+                            
+                            <div class="features-grid">
+                                <div class="feat-box">
+                                    <i class="ph-fill ph-chart-line-up feat-icon"></i>
+                                    <span class="feat-title">ROI en Tiempo Real</span>
+                                    <span class="feat-desc">Visualiza el ahorro exacto actualizado en horas y paradas evitadas.</span>
+                                </div>
+                                <div class="feat-box">
+                                    <i class="ph-fill ph-globe feat-icon"></i>
+                                    <span class="feat-title">Visión Multiplanta</span>
+                                    <span class="feat-desc">Compara la eficiencia y OEE de tus diferentes fábricas al instante.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-img-frame">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop" alt="Dashboard Ejecutivo Analytics">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="section-control" id="solucion">
+        <div class="container control-grid">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(37, 99, 235, 0.15); color: #60A5FA; border-radius: 50px; font-size: 0.85rem; font-weight: 700; margin-bottom: 25px; border: 1px solid rgba(37, 99, 235, 0.3);">
+                    <i class="ph-fill ph-chart-polar"></i> ANALÍTICA DE SOPORTE
+                </div>
+                <h2 style="font-size: 3rem; margin-bottom: 25px; line-height: 1.1; color: white;">
+                    Convierte problemas <br><span class="text-gradient">en conclusiones.</span>
+                </h2>
+                <p style="font-size: 1.15rem; color: #CBD5E1; margin-bottom: 40px; line-height: 1.7;">
+                    Argos no solo gestiona tickets. Te dice <strong>por qué</strong> se generan. Identifica qué problemas la IA no pudo resolver para que puedas reforzar esos puntos en tu equipo.
+                </p>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 25px;">
+                    <li style="display: flex; gap: 15px;">
+                        <div style="min-width: 40px; height: 40px; background: #1E293B; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--success); border: 1px solid #334155;">
+                            <i class="ph-fill ph-check-square-offset" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <div>
+                            <strong style="color: white; font-size: 1.1rem; display: block; margin-bottom: 5px;">Incidencias Escaladas</strong>
+                            <span style="color: #94A3B8;">Monitoriza en tiempo real qué problemas superaron la capacidad del bot y requirieron experto.</span>
+                        </div>
+                    </li>
+                    <li style="display: flex; gap: 15px;">
+                        <div style="min-width: 40px; height: 40px; background: #1E293B; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--accent); border: 1px solid #334155;">
+                            <i class="ph-fill ph-graduation-cap" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <div>
+                            <strong style="color: white; font-size: 1.1rem; display: block; margin-bottom: 5px;">Oportunidades de Formación</strong>
+                            <span style="color: #94A3B8;">Si el 40% de escalados son sobre "Variadores", sabes exactamente qué curso programar el mes que viene.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="dash-window">
+                <div class="dw-header">
+                    <div class="dw-dots">
+                        <div class="dw-dot" style="background:#EF4444"></div>
+                        <div class="dw-dot" style="background:#F59E0B"></div>
+                        <div class="dw-dot" style="background:#10B981"></div>
+                    </div>
+                    <div class="dw-search" style="opacity:0.3; width:150px;"></div>
+                </div>
+                <div class="dw-body">
+                    <div class="dw-kpi-row">
+                        <div class="dw-kpi">
+                            <div class="dw-lbl">Resuelto por IA</div>
+                            <div class="dw-val" style="color: #34D399;">65%</div>
+                        </div>
+                        <div class="dw-kpi">
+                            <div class="dw-lbl">Escalado a Humano</div>
+                            <div class="dw-val" style="color: #F59E0B;">35%</div> 
+                        </div>
+                        <div class="dw-kpi">
+                            <div class="dw-lbl">Tickets Abiertos</div>
+                            <div class="dw-val">12</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:end; margin-bottom:5px;">
+                        <span style="font-size:0.8rem; color:#94A3B8; font-weight:600;">Motivos de Escalado (Falta de Formación)</span>
+                    </div>
+                    <div style="background: #1E293B; padding: 20px; border-radius: 10px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#CBD5E1; margin-bottom:5px;">
+                                <span>Electrónica (Variadores)</span>
+                                <span>15 casos</span>
+                            </div>
+                            <div style="width:100%; background:#334155; height:6px; border-radius:3px;">
+                                <div style="width:75%; background:var(--danger); height:100%; border-radius:3px;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#CBD5E1; margin-bottom:5px;">
+                                <span>Hidráulica</span>
+                                <span>8 casos</span>
+                            </div>
+                            <div style="width:100%; background:#334155; height:6px; border-radius:3px;">
+                                <div style="width:40%; background:var(--accent); height:100%; border-radius:3px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dw-list">
+                        <div class="dw-item">
+                            <span><i class="ph-bold ph-warning" style="color:#F59E0B; margin-right:8px;"></i> Escalado: Ruido en Eje 2</span>
+                            <span class="dw-badge" style="background:rgba(239, 68, 68, 0.2); color:#EF4444;">Pendiente</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-case" id="casos">
+        <div class="container">
+            <div class="case-container">
+                <div class="case-left">
+                    <div style="margin-bottom: 30px;">
+                        <span class="case-stat-big">+40%</span>
+                        <span class="case-stat-lbl" style="color: #CBD5E1; font-weight: 500;">Capacidad Instalación</span>
+                    </div>
+                    <div>
+                        <span class="case-stat-big" style="color: var(--success);">-15h</span>
+                        <span class="case-stat-lbl" style="color: #CBD5E1; font-weight: 500;">Ahorro Semanal</span>
+                    </div>
+                </div>
+                <div class="case-right">
+                    <div class="client-badge">METRO24st</div>
+                    <p class="quote-text">"El problema no era técnico, era de escala. Con Argos, automatizamos el soporte y empezamos a crecer."</p>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 40px; height: 40px; background: #F1F5F9; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; color: var(--text-dark);">RS</div>
+                        <div>
+                            <strong style="display: block; color: var(--text-dark); font-size: 0.9rem;">Román Suárez</strong>
+                            <span style="font-size: 0.8rem; color: var(--text-gray);">CEO de uRetail & METRO24st</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-contact" id="contacto">
+        <div class="container contact-box">
+            <div class="contact-info">
+                <h2 style="color: var(--accent);">¿Cuánto dinero pierdes hoy?</h2>
+                <p class="lead-text">Recupera el control. Te decimos cuánto puedes ahorrar en una auditoría sin coste.</p>
+                <ul class="check-list" style="display: flex; flex-direction: column; gap: 15px;">
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><i class="ph-fill ph-check-circle" style="color: var(--success);"></i> Análisis de costes ocultos.</li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><i class="ph-fill ph-check-circle" style="color: var(--success);"></i> Proyección de ROI mensual.</li>
+                    <li style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><i class="ph-fill ph-check-circle" style="color: var(--success);"></i> Plan de implementación rápido.</li>
+                </ul>
+            </div>
+            
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h3 style="margin: 0;">Solicitar Auditoría</h3>
+                    <span style="font-size: 0.9rem; color: var(--text-gray);">Respuesta garantizada en 24h.</span>
+                </div>
+                <form name="auditoria" method="POST" data-netlify="true" action="gracias.html">
+                    <input type="hidden" name="form-name" value="auditoria">
+                    <div class="input-group" style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 8px;">Nombre</label>
+                        <input type="text" name="nombre" class="input-ui" placeholder="Ej. Roberto Pérez" required>
+                    </div>
+                    <div class="input-group" style="margin-bottom: 20px;">
+                        <label style="font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 8px;">Correo Profesional</label>
+                        <input type="email" name="email" class="input-ui" placeholder="roberto@empresa.com" required>
+                    </div>
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label style="font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 8px;">Tu Reto Principal</label>
+                        <select name="reto" class="input-ui" required>
+                            <option value="soporte">Reducir llamadas a soporte</option>
+                            <option value="formacion">Formar técnicos nuevos</option>
+                            <option value="digitalizacion">Digitalizar manuales</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Quiero mi Auditoría Gratis</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <div style="margin-bottom: 10px;">ARGOS © 2025. Tecnología para Infraestructura Crítica.</div>
+            <div style="display: flex; gap: 20px; font-weight: 500;">
+                <a href="aviso-legal.html" style="color: #64748B; text-decoration: none; font-size: 0.9rem;">Aviso Legal</a>
+                <a href="politica-privacidad.html" style="color: #64748B; text-decoration: none; font-size: 0.9rem;">Privacidad</a>
+                <a href="politica-cookies.html" style="color: #64748B; text-decoration: none; font-size: 0.9rem;">Cookies</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cookie-banner" style="position: fixed; bottom: 0; left: 0; width: 100%; background: #020617; border-top: 1px solid #1e293b; color: #f8fafc; padding: 20px 30px; z-index: 9999; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);">
+        <p style="margin: 0; font-size: 0.9rem; max-width: 70%;">
+            Usamos cookies para mejorar tu experiencia y analizar el tráfico. Al navegar, aceptas su uso.
+            <a href="politica-cookies.html" style="color: #06B6D4; text-decoration: underline;">Ver Política</a>.
+        </p>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="document.getElementById('cookie-banner').style.display='none'" style="background: #2563EB; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Aceptar</button>
+            <button onclick="location.href='politica-cookies.html'" style="background: transparent; border: 1px solid #64748B; color: #94A3B8; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Configurar</button>
+        </div>
+    </div>
+
+    <script>
+        function initTabs() {
+            const activeBtn = document.querySelector('.tab-btn.active');
+            const glider = document.getElementById('glider');
+            
+            if (activeBtn && glider) {
+                const activeContent = document.querySelector('.tab-content.active');
+                if(activeContent) activeContent.style.opacity = 1;
+
+                glider.style.width = activeBtn.offsetWidth + 'px';
+                glider.style.transform = `translateX(${activeBtn.offsetLeft - 6}px)`;
+            }
+        }
+
+        function switchTab(event, tabId) {
+            const clickedBtn = event.currentTarget;
+            const glider = document.getElementById('glider');
+            
+            // Mover Glider
+            glider.style.width = clickedBtn.offsetWidth + 'px';
+            glider.style.transform = `translateX(${clickedBtn.offsetLeft - 6}px)`;
+
+            // Cambiar Botones Activos
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+
+            // Cambiar Contenido (con fade rápido)
+            document.querySelectorAll('.tab-content').forEach(content => {
+                if(content.id === tabId) {
+                    content.style.display = 'block';
+                    setTimeout(() => content.style.opacity = 1, 10);
+                } else {
+                    content.style.opacity = 0;
+                    setTimeout(() => content.style.display = 'none', 300);
+                }
+            });
+        }
+
+        window.addEventListener('load', initTabs);
+        window.addEventListener('resize', initTabs);
+        setTimeout(initTabs, 500);
+    </script>
+
+</body>
+</html>

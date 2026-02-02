@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <loc>https://argostech.es/</loc>
+      <lastmod>2025-11-22</lastmod>
+      <priority>1.00</priority>
+   </url>
+   
+   <url>
+      <loc>https://argostech.es/blog.html</loc>
+      <lastmod>2025-11-22</lastmod>
+      <priority>0.80</priority>
+   </url>
+
+   <url>
+      <loc>https://argostech.es/aviso-legal.html</loc>
+      <lastmod>2025-11-22</lastmod>
+      <priority>0.30</priority>
+   </url>
+   <url>
+      <loc>https://argostech.es/politica-privacidad.html</loc>
+      <lastmod>2025-11-22</lastmod>
+      <priority>0.30</priority>
+   </url>
+   <url>
+      <loc>https://argostech.es/politica-cookies.html</loc>
+      <lastmod>2025-11-22</lastmod>
+      <priority>0.30</priority>
+   </url>
+</urlset>

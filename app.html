@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argos Infinity | Gestión Corporativa</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#050505', panel: '#0f1115', border: '#27272a',
+                        brand: '#38bdf8', video: '#a78bfa', tech: '#fb923c',
+                        success: '#10b981', danger: '#f43f5e',
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    animation: { 'fade-in': 'fadeIn 0.4s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
+                }
+            }
+        }
+    </script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style type="text/tailwindcss">
+        body { background-color: #050505; color: #94a3b8; font-family: 'Inter', sans-serif; }
+        .glass { background: #0f1115; border: 1px solid #27272a; }
+        .glass-panel { background: rgba(15, 17, 21, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .input-field { background: #161920; border: 1px solid #27272a; color: white; padding: 10px; border-radius: 6px; width: 100%; outline: none; transition: all 0.2s; font-size: 0.9rem; }
+        .input-field:focus { border-color: #38bdf8; background: #1e222b; }
+        .filter-btn { @apply flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-400 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:text-white transition cursor-pointer select-none; }
+        .filter-btn.active { @apply bg-brand/10 text-brand border-brand/20; }
+        .btn-primary { background: #38bdf8; color: #000; font-weight: 600; padding: 8px 16px; border-radius: 6px; transition: hover 0.2s; display: inline-flex; items-align: center; justify-content: center; }
+        .btn-action { @apply px-3 py-1.5 rounded text-xs font-bold transition border flex items-center gap-2; }
+        .tech-card { @apply border border-border p-3 rounded-lg cursor-pointer transition hover:bg-white/5 flex items-center gap-3; }
+        .tech-card.selected { @apply border-brand bg-brand/5 ring-1 ring-brand; }
+        @keyframes savedFlash { 0% { border-color: #10b981; } 100% { border-color: rgba(255,255,255,0.1); } }
+        .saved-success { animation: savedFlash 1s ease-out; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+
+<body x-data="argosApp()" x-init="init()" class="h-screen flex flex-col overflow-hidden">
+
+    <div x-show="!session" class="fixed inset-0 z-50 bg-[#050505] flex items-center justify-center fade-in" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+        <div class="glass w-full max-w-md p-8 rounded-2xl shadow-2xl border border-border relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-brand/10 blur-3xl"></div>
+            <div class="relative z-10">
+                <div class="flex flex-col items-center mb-8">
+                    <div class="w-12 h-12 bg-gradient-to-br from-brand to-blue-700 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-900/20 mb-4">
+                        <i class="fa-solid fa-infinity text-lg"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">Argos Infinity</h2>
+                    <p class="text-slate-500 text-sm mt-1">Acceso Corporativo Seguro</p>
+                </div>
+                <form @submit.prevent="login" class="space-y-4">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Email Corporativo</label>
+                        <input type="email" x-model="loginData.email" class="input-field bg-black/50 border-white/10 focus:border-brand h-12" placeholder="usuario@empresa.com" required>
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Contraseña</label>
+                        <input type="password" x-model="loginData.password" class="input-field bg-black/50 border-white/10 focus:border-brand h-12" placeholder="••••••••" required>
+                    </div>
+                    <div x-show="loginData.error" class="p-3 bg-danger/10 border border-danger/20 rounded text-danger text-xs font-bold text-center" x-text="loginData.error"></div>
+                    <button type="submit" class="w-full bg-brand hover:bg-brand/90 text-black font-bold h-12 rounded-lg transition shadow-lg shadow-brand/20 flex items-center justify-center gap-2" :disabled="loading">
+                        <span x-show="!loading">Ingresar al Sistema</span>
+                        <i x-show="loading" class="fa-solid fa-circle-notch animate-spin"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="session" class="flex-1 flex overflow-hidden fade-in" x-cloak>
+        
+        <aside class="w-64 bg-panel border-r border-border flex flex-col z-20">
+            <div class="h-16 flex items-center px-6 border-b border-border">
+                <div class="w-8 h-8 bg-gradient-to-br from-brand to-blue-700 rounded flex items-center justify-center text-white font-bold shadow-lg shadow-blue-900/20">
+                    <i class="fa-solid fa-infinity text-xs"></i>
+                </div>
+                <div class="ml-3">
+                    <div class="text-white font-bold tracking-tight">ARGOS</div>
+                    <div class="text-[9px] text-brand uppercase tracking-widest font-mono" x-text="userProfile ? userProfile.empresa_id : 'CARGANDO...'"></div>
+                </div>
+            </div>
+
+            <nav class="flex-1 py-6 px-3 space-y-1">
+                <p class="px-3 text-[10px] text-slate-600 uppercase font-bold tracking-wider mb-2 mt-1">Negocio</p>
+                <a href="#" @click.prevent="view = 'dashboard'" :class="view === 'dashboard' ? 'bg-white/5 text-white border-l-2 border-brand' : 'text-slate-500 hover:text-white'" class="flex items-center gap-3 px-3 py-3 rounded transition"><i class="fa-solid fa-chart-pie w-5 text-center"></i> <span class="text-sm font-medium">Dashboard</span></a>
+                <a href="#" @click.prevent="view = 'fleet'" :class="view === 'fleet' ? 'bg-white/5 text-white border-l-2 border-brand' : 'text-slate-500 hover:text-white'" class="flex items-center gap-3 px-3 py-3 rounded transition"><i class="fa-solid fa-list-check w-5 text-center"></i> <span class="text-sm font-medium">Incidencias</span></a>
+                
+                <p class="px-3 text-[10px] text-slate-600 uppercase font-bold tracking-wider mb-2 mt-6">Logística</p>
+                <a href="#" @click.prevent="view = 'calendar'" :class="view === 'calendar' ? 'bg-white/5 text-white border-l-2 border-brand' : 'text-slate-500 hover:text-white'" class="flex items-center gap-3 px-3 py-3 rounded transition"><i class="fa-regular fa-calendar-check w-5 text-center"></i> <span class="text-sm font-medium">Agenda Técnicos</span></a>
+                <a href="#" @click.prevent="view = 'stock'" :class="view === 'stock' ? 'bg-white/5 text-white border-l-2 border-brand' : 'text-slate-500 hover:text-white'" class="flex items-center gap-3 px-3 py-3 rounded transition"><i class="fa-solid fa-boxes-stacked w-5 text-center"></i> <span class="text-sm font-medium">Stock</span></a>
+            </nav>
+
+            <div class="p-4 border-t border-border bg-black/20">
+                <div class="flex items-center gap-3 px-2 mb-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold border border-slate-700">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs text-white font-bold truncate" x-text="session?.user.email"></div>
+                        <div class="text-[9px] text-slate-500 truncate">Usuario Conectado</div>
+                    </div>
+                </div>
+                <button @click="logout()" class="flex items-center gap-3 text-danger/70 hover:text-danger hover:bg-danger/5 transition group w-full p-2 rounded border border-transparent hover:border-danger/20">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span class="text-xs font-bold uppercase tracking-wider">Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col bg-obsidian relative">
+            <header class="h-16 border-b border-border bg-panel/80 backdrop-blur flex items-center justify-between px-6 z-10 sticky top-0">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-white font-medium text-lg" x-text="getPageTitle()"></h1>
+                    <div x-show="view === 'dashboard'" class="hidden md:flex items-center gap-1 bg-black/50 border border-border rounded-lg p-1 ml-4 transition" x-transition>
+                        <button @click="setTimeFilter('today')" :class="timeFilter === 'today' ? 'bg-brand text-black shadow' : 'text-slate-500 hover:text-white'" class="px-3 py-1 text-xs font-bold rounded transition">Hoy</button>
+                        <button @click="setTimeFilter('month')" :class="timeFilter === 'month' ? 'bg-brand text-black shadow' : 'text-slate-500 hover:text-white'" class="px-3 py-1 text-xs font-bold rounded transition">Mes</button>
+                        <button @click="setTimeFilter('all')" :class="timeFilter === 'all' ? 'bg-brand text-black shadow' : 'text-slate-500 hover:text-white'" class="px-3 py-1 text-xs font-bold rounded transition">Todo</button>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button @click="modals.settings = true" class="mr-4 text-slate-400 hover:text-white transition w-8 h-8 flex items-center justify-center rounded hover:bg-white/5"><i class="fa-solid fa-gear"></i></button>
+                    <div class="h-4 w-px bg-border mx-2"></div>
+                    <button @click="reloadData()" class="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded border border-transparent hover:border-border ml-2">
+                        <i class="fa-solid fa-rotate-right" :class="{'animate-spin': loading}"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div x-show="view === 'dashboard'" class="flex-1 overflow-y-auto p-8 fade-in relative">
+                <div class="mb-8 relative overflow-hidden rounded-2xl border border-border bg-gradient-to-r from-slate-900 to-black p-10 shadow-2xl group">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-brand/20 blur-3xl transition duration-1000 group-hover:bg-brand/30"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-end">
+                        <div>
+                            <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-2">Impacto Económico (<span x-text="timeFilterTranslated"></span>)</h2>
+                            <div class="flex items-baseline gap-4">
+                                <span class="text-6xl font-mono font-bold text-white tracking-tight drop-shadow-lg" x-text="formatCurrency(stats.savings)">€0.00</span>
+                                <span class="text-sm font-bold text-success bg-success/10 px-3 py-1.5 rounded-full border border-success/20 flex items-center shadow-lg shadow-success/10">
+                                    <i class="fa-solid fa-arrow-trend-up mr-2"></i>Optimizado
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass p-6 rounded-xl border-t-4 border-t-brand hover:bg-white/5 transition group relative overflow-hidden shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <div class="text-brand text-xs font-bold uppercase tracking-wider mb-1">Nivel 1: Bot IA</div>
+                                <div class="text-5xl font-bold text-white tracking-tight" x-text="stats.lvl1">0</div>
+                            </div>
+                            <div class="text-brand/20"><i class="fa-solid fa-robot text-5xl"></i></div>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-2">
+                            <div class="bg-brand h-full rounded-full" :style="`width: ${getPercentage(stats.lvl1)}%`"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-medium text-slate-500">
+                            <span>Resolución Automática (0€)</span>
+                            <span class="text-brand" x-text="getPercentage(stats.lvl1) + '%'">0%</span>
+                        </div>
+                    </div>
+                    
+                     <div class="glass p-6 rounded-xl border-t-4 border-t-video hover:bg-white/5 transition group relative overflow-hidden shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <div class="text-video text-xs font-bold uppercase tracking-wider mb-1">Nivel 2: Video</div>
+                                <div class="text-5xl font-bold text-white tracking-tight" x-text="stats.lvl2">0</div>
+                            </div>
+                            <div class="text-video/20"><i class="fa-solid fa-video text-5xl"></i></div>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-2">
+                            <div class="bg-video h-full rounded-full" :style="`width: ${getPercentage(stats.lvl2)}%`"></div>
+                        </div>
+                         <div class="flex justify-between text-[10px] font-medium text-slate-500">
+                            <span>Asistencia Remota</span>
+                            <span class="text-video" x-text="getPercentage(stats.lvl2) + '%'">0%</span>
+                        </div>
+                    </div>
+                     <div class="glass p-6 rounded-xl border-t-4 border-t-tech hover:bg-white/5 transition group relative overflow-hidden shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <div class="text-tech text-xs font-bold uppercase tracking-wider mb-1">Nivel 3: Técnico</div>
+                                <div class="text-5xl font-bold text-white tracking-tight" x-text="stats.lvl3">0</div>
+                            </div>
+                            <div class="text-tech/20"><i class="fa-solid fa-truck-fast text-5xl"></i></div>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-2">
+                            <div class="bg-tech h-full rounded-full" :style="`width: ${getPercentage(stats.lvl3)}%`"></div>
+                        </div>
+                         <div class="flex justify-between text-[10px] font-medium text-slate-500">
+                            <span>Visita Presencial</span>
+                            <span class="text-tech" x-text="getPercentage(stats.lvl3) + '%'">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[400px]">
+                    <div class="glass p-6 rounded-xl flex flex-col relative border border-border">
+                         <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-white font-bold flex items-center gap-2 text-sm"><i class="fa-solid fa-chart-pie text-brand"></i> Eficiencia del Bot</h3>
+                        </div>
+                        <div class="flex-1 w-full min-h-0 relative flex items-center justify-center">
+                            <canvas id="efficiencyChart" class="relative z-10"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
+                                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Tasa IA</span>
+                                <span class="text-6xl font-bold text-white tracking-tighter" x-text="getGlobalBotRate() + '%'">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="view === 'fleet'" class="flex-1 flex flex-col overflow-hidden fade-in" x-cloak>
+                 <div class="grid grid-cols-3 gap-6 px-8 pt-8 mb-6">
+                    <div class="p-4 rounded-xl border border-white/5 bg-white/[0.02] flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-brand"><i class="fa-solid fa-list-ol"></i></div><div><div class="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Resultados</div><div class="text-xl font-bold text-white" x-text="filteredIncidencias.length + ' Casos'"></div></div></div>
+                    <div class="p-4 rounded-xl border border-white/5 bg-white/[0.02] flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-success"><i class="fa-solid fa-euro-sign"></i></div><div><div class="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Coste Estimado</div><div class="text-xl font-bold text-white" x-text="formatCurrency(filteredCost)"></div></div></div>
+                    <div class="p-4 rounded-xl border border-white/5 bg-white/[0.02] flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-video"><i class="fa-solid fa-robot"></i></div><div><div class="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Tasa Auto-Resolución</div><div class="text-xl font-bold text-white" x-text="filteredBotRate + '%'"></div></div></div>
+                </div>
+                <div class="px-8 pb-4 flex justify-between items-center z-20">
+                    <div class="flex items-center gap-3">
+                        <div class="relative group"><i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-500 text-xs group-focus-within:text-brand transition"></i><input type="text" x-model="searchQuery" placeholder="Buscar..." class="bg-black/40 border border-white/10 text-white text-xs rounded-lg w-64 pl-9 py-2 outline-none focus:border-brand transition shadow-lg"></div>
+                         <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                            <button @click="open = !open" class="filter-btn" :class="filters.levels.length > 0 ? 'active' : ''"><i class="fa-solid fa-layer-group"></i> Nivel <i class="fa-solid fa-chevron-down text-[9px] ml-1 opacity-50"></i></button>
+                            <div x-show="open" class="absolute top-full left-0 mt-2 w-48 bg-[#161920] border border-border rounded-lg shadow-xl p-2 z-50"><template x-for="lvl in ['lvl1', 'lvl2', 'lvl3']"><label class="flex items-center p-2 rounded hover:bg-white/5 cursor-pointer"><input type="checkbox" :value="lvl" x-model="filters.levels" class="mr-2 accent-brand"><span class="text-xs text-slate-300" x-text="lvl==='lvl1'?'Bot IA':(lvl==='lvl2'?'Video':'Técnico')"></span></label></template></div>
+                        </div>
+                         <button x-show="filters.levels.length || searchQuery" @click="resetFilters()" class="text-[10px] text-slate-500 hover:text-white underline">Limpiar</button>
+                    </div>
+                     <button @click="exportExcel()" class="bg-brand/10 hover:bg-brand/20 text-brand border border-brand/20 px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fa-solid fa-download"></i> Exportar</button>
+                </div>
+                 <div class="flex-1 overflow-hidden px-8 pb-8">
+                    <div class="glass-panel w-full h-full rounded-xl overflow-hidden flex flex-col relative">
+                        <div class="bg-white/[0.02] border-b border-white/5 grid grid-cols-12 gap-4 px-6 py-3 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                            <div class="col-span-2">Nivel Resolución</div>
+                            <div class="col-span-4">Incidencia / Máquina</div>
+                            <div class="col-span-3">Cliente / Ubicación</div>
+                            <div class="col-span-1">Estado</div>
+                            <div class="col-span-2 text-right">Acción</div>
+                        </div>
+                        <div class="flex-1 overflow-y-auto">
+                            <template x-for="row in filteredIncidencias" :key="row.id">
+                                <div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 hover:bg-white/[0.02] transition items-center group">
+                                    <div class="col-span-2">
+                                        <div class="relative w-full">
+                                            <select x-model="row.localLevel" @change="saveOverride(row, $el)" class="appearance-none bg-black/40 font-bold text-xs outline-none cursor-pointer w-full pl-8 py-1.5 rounded border border-white/10 hover:border-brand transition focus:border-brand" :class="{'text-brand': row.localLevel === 'lvl1', 'text-video': row.localLevel === 'lvl2', 'text-tech': row.localLevel === 'lvl3'}"><option value="lvl1" class="bg-panel text-brand">Bot IA</option><option value="lvl2" class="bg-panel text-video">Videollamada</option><option value="lvl3" class="bg-panel text-tech">Visita Técnica</option></select>
+                                            <div class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><div class="w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]" :class="{'bg-brand text-brand': row.localLevel === 'lvl1', 'bg-video text-video': row.localLevel === 'lvl2', 'bg-tech text-tech': row.localLevel === 'lvl3'}"></div></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-span-4 pr-4">
+                                        <div class="text-white text-sm font-medium truncate mb-1" x-text="row.incidencia || 'Sin Asunto'"></div>
+                                        <div class="text-xs text-slate-400 mb-1" x-show="row.machine_name"><i class="fa-solid fa-microchip mr-1"></i> <span x-text="row.machine_name + ' (' + (row.machine_id || '') + ')'"></span></div>
+                                        <div class="text-[10px] text-slate-500 italic truncate" x-show="row.acciones_realizadas" x-text="'Acción: ' + row.acciones_realizadas"></div>
+                                        <div class="flex gap-2 mt-1"><span x-show="row.prioridad === 'Crítica'" class="text-[9px] bg-danger/10 text-danger border border-danger/20 px-1.5 py-0.5 rounded font-bold">CRÍTICA</span><span class="text-[10px] text-slate-500 font-mono" x-text="new Date(row.created_at).toLocaleDateString()"></span></div>
+                                    </div>
+                                    <div class="col-span-3">
+                                        <div class="text-slate-300 text-xs font-medium truncate" x-text="row.cliente_correo"></div>
+                                        <div class="text-[10px] text-slate-500 truncate mt-1" x-show="row.ubicacion"><i class="fa-solid fa-location-dot mr-1"></i> <span x-text="row.ubicacion"></span></div>
+                                        <div class="text-[9px] text-slate-600 truncate font-mono mt-0.5" x-show="row.user_id" x-text="'ID: ' + row.user_id"></div>
+                                    </div>
+                                    <div class="col-span-1">
+                                        <div x-show="isAssigned(row.id)" class="text-success text-[10px] font-bold uppercase flex items-center gap-1"><i class="fa-solid fa-check-circle"></i> Asignado</div>
+                                        <div x-show="!isAssigned(row.id) && row.localLevel !== 'lvl1'" class="text-slate-500 text-[10px] uppercase font-bold">Pendiente</div>
+                                        <div x-show="row.localLevel === 'lvl1'" class="text-brand text-[10px] uppercase font-bold">Automático</div>
+                                    </div>
+                                    <div class="col-span-2 text-right">
+                                        <button x-show="row.localLevel !== 'lvl1' && !isAssigned(row.id)" @click="openSmartAssign(row)" class="btn-action bg-white/5 border-white/10 text-slate-300 hover:bg-brand hover:border-brand hover:text-black hover:shadow-lg hover:shadow-brand/20 ml-auto"><i class="fa-regular fa-calendar-plus"></i> Asignar</button>
+                                        <button x-show="isAssigned(row.id)" disabled class="btn-action bg-success/10 border-success/20 text-success cursor-default ml-auto opacity-70"><i class="fa-solid fa-calendar-check"></i> Agendado</button>
+                                        <div x-show="row.localLevel === 'lvl1'" class="text-right text-xs text-slate-600 font-mono line-through">0.00 €</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="view === 'calendar'" class="flex-1 flex overflow-hidden fade-in" x-cloak>
+                <div class="w-72 border-r border-border bg-panel flex flex-col z-10">
+                    <div class="p-5 border-b border-border bg-black/20"><h3 class="text-white font-bold text-sm">Carga de Trabajo</h3></div>
+                    <div class="flex-1 overflow-y-auto p-3 space-y-2">
+                        <template x-for="tech in technicians" :key="tech.id">
+                            <div @click="currentTech = tech" class="p-3 rounded-xl cursor-pointer flex items-center gap-3 transition group relative border border-transparent" :class="currentTech?.id === tech.id ? 'bg-white/5 border-border shadow-inner' : 'hover:bg-white/5'">
+                                <div class="relative shrink-0"><img :src="tech.avatar_url || `https://ui-avatars.com/api/?name=${tech.nombre_completo}&background=random`" class="w-10 h-10 rounded-full bg-slate-800 object-cover border border-slate-600"><div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-panel" :class="getTechLoad(tech.id) > 80 ? 'bg-danger' : (getTechLoad(tech.id) > 40 ? 'bg-yellow-500' : 'bg-success')"></div></div>
+                                <div class="flex-1 min-w-0"><div class="text-xs font-bold text-white truncate" x-text="tech.nombre_completo"></div><div class="text-[9px] text-slate-500" x-text="Math.round(getTechLoad(tech.id)) + '% Ocupación'"></div></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div class="flex-1 flex flex-col bg-obsidian relative">
+                     <div class="h-16 border-b border-border flex justify-between items-center px-8 bg-panel/50 backdrop-blur">
+                        <h3 class="text-white font-bold text-lg" x-text="currentTech ? currentTech.nombre_completo : 'Selecciona un Técnico'"></h3>
+                        <div class="flex items-center gap-4 bg-black/40 p-1 pr-4 rounded-full border border-border">
+                            <button @click="changeDate(-1)" class="w-8 h-8 rounded-full hover:bg-white/10 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                            <input type="date" x-model="calendarDate" class="bg-transparent text-white text-sm outline-none font-mono">
+                            <button @click="changeDate(1)" class="w-8 h-8 rounded-full hover:bg-white/10 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-8 relative">
+                         <div x-show="currentTech" class="max-w-3xl mx-auto pb-20">
+                            <template x-for="hour in [8,9,10,11,12,13,14,15,16,17,18]" :key="hour">
+                                <div class="flex group relative">
+                                    <div class="w-16 flex flex-col items-end pr-6 pt-2"><span class="text-sm font-bold text-white font-mono" x-text="hour + ':00'"></span></div>
+                                    <div class="flex-1 ml-6 pb-8 pt-0 relative min-h-[80px] border-l border-border pl-6">
+                                        <button @click="openEventModal(hour)" class="absolute top-2 left-6 right-0 h-10 border-2 border-dashed border-slate-700/50 rounded-lg flex items-center justify-center text-slate-500 text-xs opacity-0 group-hover:opacity-100 hover:border-brand hover:text-brand hover:bg-brand/5 transition"><i class="fa-solid fa-plus mr-2"></i> Agendar</button>
+                                        <template x-for="ev in getEvents(hour)" :key="ev.id">
+                                            <div class="absolute inset-y-1 left-6 right-0 z-10 bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-lg hover:border-l-4 hover:border-l-brand transition-all cursor-pointer">
+                                                <div class="text-white text-sm font-medium" x-text="ev.cliente_info"></div><div class="text-xs text-slate-400" x-text="ev.tipo"></div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div x-show="!currentTech" class="flex flex-col items-center justify-center h-full text-slate-600"><i class="fa-regular fa-calendar text-4xl mb-4 opacity-20"></i><p>Selecciona un técnico</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="view === 'stock'" class="flex-1 overflow-y-auto p-8 fade-in" x-cloak>
+                <div class="flex justify-between items-center mb-8"><h2 class="text-white font-bold text-xl">Inventario de Recambios</h2><button @click="openStockModal(null)" class="btn-primary shadow-lg shadow-brand/20 text-xs"><i class="fa-solid fa-plus mr-2"></i> Nuevo Producto</button></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <template x-for="item in filteredStock" :key="item.id">
+                        <div class="glass rounded-xl flex flex-col group transition relative overflow-hidden duration-300 hover:-translate-y-1" :class="item.cantidad_actual <= item.cantidad_minima ? 'border-danger/50' : 'hover:border-slate-500'">
+                            <div x-show="item.cantidad_actual <= item.cantidad_minima" class="absolute top-0 right-0 z-20 bg-danger text-white text-[9px] font-bold px-2 py-1 rounded-bl-lg">BAJO STOCK</div>
+                            <div class="h-32 w-full bg-slate-900 relative border-b border-border"><img :src="item.foto_url || 'https://via.placeholder.com/300x200?text=Sin+Imagen'" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition"></div>
+                            <div class="p-4 flex-1 flex flex-col"><div class="text-white font-bold text-sm truncate mb-3" x-text="item.nombre"></div><div class="grid grid-cols-2 gap-2 mt-auto"><div class="bg-black/30 rounded p-2 border border-border flex flex-col items-center justify-center"><div class="text-[9px] text-slate-500 uppercase font-bold">Stock</div><div class="text-xl font-bold font-mono" :class="item.cantidad_actual <= item.cantidad_minima ? 'text-danger' : 'text-white'" x-text="item.cantidad_actual"></div></div><div class="bg-black/30 rounded p-2 border border-border flex flex-col items-center justify-center"><div class="text-[9px] text-slate-500 uppercase font-bold">Precio</div><div class="text-sm font-bold text-slate-300 font-mono" x-text="item.price + '€'"></div></div></div></div>
+                            <div class="p-3 border-t border-border bg-black/20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button @click="openStockModal(item)" class="flex-1 py-1.5 text-xs text-slate-300 bg-slate-800 rounded border border-border">Editar</button><button @click="deleteStock(item.id)" class="px-3 py-1.5 text-xs text-danger bg-danger/10 rounded border border-danger/20"><i class="fa-solid fa-trash"></i></button></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div x-show="modals.smartAssign" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" x-cloak>
+        <div class="glass w-[500px] p-8 rounded-xl shadow-2xl relative border border-brand/20">
+            <div class="flex items-start justify-between mb-6"><div><h3 class="text-white font-bold text-xl flex items-center gap-2"><i class="fa-solid fa-robot text-brand"></i> Asignación Inteligente</h3><p class="text-xs text-slate-500 mt-1" x-text="'Incidencia #' + (smartTarget ? smartTarget.id : '')"></p></div><button @click="modals.smartAssign = false" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button></div>
+            <div class="bg-white/5 rounded-lg p-4 border border-white/10 mb-6" x-show="smartTarget">
+                <div class="flex justify-between mb-2"><span class="text-[10px] uppercase font-bold text-slate-500">Cliente</span><span class="text-xs text-white font-bold" x-text="smartTarget.cliente_correo"></span></div>
+                <div class="flex justify-between"><span class="text-[10px] uppercase font-bold text-slate-500">Problema</span><span class="text-xs text-slate-300 truncate w-48 text-right" x-text="smartTarget.incidencia"></span></div>
+            </div>
+            <div class="mb-6"><h4 class="text-xs font-bold text-white mb-3">1. Seleccionar Técnico Disponible</h4><div class="space-y-2 max-h-48 overflow-y-auto pr-1"><template x-for="tech in technicians" :key="tech.id"><div @click="smartSelection.techId = tech.id" class="tech-card" :class="smartSelection.techId === tech.id ? 'selected' : ''"><img :src="tech.avatar_url || `https://ui-avatars.com/api/?name=${tech.nombre_completo}`" class="w-8 h-8 rounded-full"><div class="flex-1"><div class="text-sm font-bold text-white" x-text="tech.nombre_completo"></div><div class="text-[10px] text-slate-500">Carga hoy: <span :class="getTechLoad(tech.id)>80?'text-danger':'text-success'" x-text="Math.round(getTechLoad(tech.id))+'%'"></span></div></div><div x-show="smartSelection.techId === tech.id" class="text-brand"><i class="fa-solid fa-circle-check"></i></div></div></template></div></div>
+            <div class="mb-6"><h4 class="text-xs font-bold text-white mb-3">2. Agendar Intervención</h4><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] text-slate-500 block mb-1">Fecha</label><input type="date" x-model="smartSelection.date" class="input-field"></div><div><label class="text-[10px] text-slate-500 block mb-1">Hora Inicio</label><select x-model="smartSelection.hour" class="input-field"><template x-for="h in [8,9,10,11,12,13,14,15,16,17,18]"><option :value="h" x-text="h + ':00'"></option></template></select></div></div></div>
+            <button @click="confirmSmartAssignment()" id="btn-smart-confirm" class="btn-primary w-full justify-center shadow-lg shadow-brand/20" :disabled="!smartSelection.techId"><i class="fa-solid fa-calendar-check mr-2"></i> Confirmar Asignación</button>
+        </div>
+    </div>
+
+    <div x-show="modals.stock" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" x-cloak>
+        <div class="glass w-[500px] p-8 rounded-xl shadow-2xl relative"><h3 class="text-white font-bold text-xl mb-6" x-text="newStock.id ? 'Editar Producto' : 'Alta de Nuevo Recambio'"></h3><div class="space-y-4"><input type="text" x-model="newStock.nombre" placeholder="Nombre Comercial" class="input-field"><div class="grid grid-cols-2 gap-4"><input type="text" x-model="newStock.sku" placeholder="SKU" class="input-field font-mono"><input type="number" x-model="newStock.price" placeholder="Precio €" class="input-field text-right"></div><div class="grid grid-cols-2 gap-4"><input type="number" x-model="newStock.cantidad_actual" placeholder="Stock Actual" class="input-field"><input type="number" x-model="newStock.cantidad_minima" placeholder="Alerta Mínima" class="input-field"></div><div class="upload-area relative h-20 flex flex-col items-center justify-center rounded border-2 border-dashed border-slate-700 hover:border-brand transition"><input type="file" @change="uploadImage" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"><div x-show="!uploading && !newStock.foto_url" class="text-xs text-slate-400">Subir Foto</div><div x-show="uploading" class="text-brand text-xs animate-pulse font-bold">Subiendo...</div><img x-show="newStock.foto_url" :src="newStock.foto_url" class="h-full w-full object-contain p-1 absolute inset-0"></div></div><div class="flex justify-end gap-3 mt-6"><button @click="modals.stock = false" class="text-slate-400 text-sm">Cancelar</button><button @click="saveStock()" class="btn-primary" :disabled="uploading">Guardar</button></div></div>
+    </div>
+
+    <div x-show="modals.event" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" x-cloak>
+        <div class="glass w-[400px] p-6 rounded-xl shadow-2xl"><h3 class="text-white font-bold mb-4">Agendar Cita Manual</h3><div class="space-y-3"><input type="text" x-model="newEvent.cliente_info" class="input-field" placeholder="Cliente / Empresa"><select x-model="newEvent.tipo" class="input-field"><option>Videoconferencia</option><option>Visita Presencial</option></select><textarea x-model="newEvent.notas" class="input-field" rows="3" placeholder="Notas..."></textarea></div><div class="flex justify-end gap-2 mt-4"><button @click="modals.event = false" class="text-slate-400 text-xs px-3">Cancelar</button><button @click="saveEvent()" class="btn-primary">Confirmar</button></div></div>
+    </div>
+
+    <div x-show="modals.settings" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" x-cloak>
+        <div class="glass w-[400px] p-6 rounded-xl shadow-2xl"><h3 class="text-white font-bold mb-4">Configuración Costes</h3><div class="space-y-4"><div><label class="text-[10px] text-video uppercase font-bold">Coste Video (€)</label><input type="number" x-model="config.costVideo" class="input-field text-right"></div><div><label class="text-[10px] text-tech uppercase font-bold">Coste Técnico (€)</label><input type="number" x-model="config.costTech" class="input-field text-right"></div></div><div class="flex justify-end gap-3 mt-6"><button @click="modals.settings = false" class="text-slate-400 text-xs">Cancelar</button><button @click="saveSettings()" class="bg-brand text-black px-4 py-2 rounded font-bold text-xs hover:bg-brand/80">Guardar</button></div></div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN SUPABASE
+        const SUPABASE_URL = 'https://gnurwcljovkyxzsqhnix.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdudXJ3Y2xqb3ZreXh6c3Fobml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2Mjk1MDEsImV4cCI6MjA3OTIwNTUwMX0.t2Hrc5-TclpEGegr2qNwCowdB8uQM2xH7giqha4ntSM';
+        const N8N_WEBHOOK = 'https://uretail.app.n8n.cloud/webhook/9e5a7c17-b373-4d0d-8dec-e21626458bc6';
+        
+        // CORRECCIÓN 2: Renombrar variable para evitar conflicto con la global 'supabase' del CDN
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function argosApp() {
+            return {
+                view: 'dashboard', loading: false, uploading: false,
+                modals: { stock: false, event: false, settings: false, smartAssign: false },
+                config: JSON.parse(localStorage.getItem('argos_config')) || { costBot: 0.00, costVideo: 8.50, costTech: 65.00 },
+                timeFilter: 'all', searchQuery: '', filters: { levels: [], priorities: [] },
+                
+                // DATOS PRINCIPALES
+                rawIncidencias: [], stock: [], technicians: [], events: [],
+                assignedIncidents: JSON.parse(localStorage.getItem('argos_assigned_ids')) || [],
+                stats: { savings: 0, lvl1: 0, lvl2: 0, lvl3: 0 },
+                
+                // AUTH & SESIÓN
+                session: null,
+                userProfile: null,
+                loginData: { email: '', password: '', error: '' },
+
+                // FORMULARIOS TEMPORALES
+                currentTech: null,
+                newStock: { id: null, nombre: '', sku: '', price: 0, cantidad_actual: 0, cantidad_minima: 5, foto_url: '' },
+                newEvent: { hour: 0, cliente_info: '', tipo: 'Videoconferencia', notas: '' },
+                smartTarget: null,
+                smartSelection: { techId: null, date: new Date().toISOString().split('T')[0], hour: 9 },
+
+                calendarDate: new Date().toISOString().split('T')[0],
+                chartInstancePie: null, chartInstanceBar: null,
+
+                async init() {
+                    // Verificar sesión existente al cargar usando supabaseClient
+                    const { data } = await supabaseClient.auth.getSession();
+                    if (data.session) {
+                        this.session = data.session;
+                        await this.fetchUserProfile();
+                        await this.reloadData();
+                    }
+
+                    // Escuchar cambios en auth (login/logout) usando supabaseClient
+                    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                        this.session = session;
+                        if (event === 'SIGNED_IN' && session) {
+                            await this.fetchUserProfile();
+                            await this.reloadData();
+                        } else if (event === 'SIGNED_OUT') {
+                            this.userProfile = null;
+                            this.rawIncidencias = [];
+                            this.stock = [];
+                            this.technicians = [];
+                            this.events = [];
+                        }
+                    });
+
+                    this.$watch('view', (val) => { if(val === 'dashboard') setTimeout(() => this.recalculateROI(), 100); });
+                },
+
+                // --- GESTIÓN DE USUARIO Y LOGIN ---
+                async login() {
+                    this.loading = true;
+                    this.loginData.error = '';
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: this.loginData.email,
+                        password: this.loginData.password
+                    });
+                    if (error) this.loginData.error = 'Credenciales incorrectas o error de conexión';
+                    this.loading = false;
+                },
+
+                async logout() {
+                    await supabaseClient.auth.signOut();
+                    this.loginData = { email: '', password: '', error: '' };
+                },
+
+                async fetchUserProfile() {
+                    if (!this.session) return;
+                    try {
+                        const { data } = await supabaseClient.from('profiles').select('*').eq('id', this.session.user.id).single();
+                        if (data) this.userProfile = data;
+                    } catch (e) { console.error("Error perfil", e); }
+                },
+
+                // --- CARGA DE DATOS FILTRADA (INSENSIBLE A MAYÚSCULAS) ---
+                async reloadData() {
+                    if (!this.session || !this.userProfile) return;
+                    this.loading = true;
+
+                    // 1. Preparar queries base usando supabaseClient
+                    let qInc = supabaseClient.from('incidencias').select('*').order('created_at', {ascending:false});
+                    let qStk = supabaseClient.from('stock').select('*').order('id', {ascending:false});
+                    let qTch = supabaseClient.from('tecnicos').select('*');
+                    let qAgd = supabaseClient.from('agenda_tecnicos').select('*');
+
+                    // 2. Aplicar filtro de empresa (usando ILIKE para ignorar mayúsculas)
+                    const miEmpresa = this.userProfile.empresa_id;
+                    
+                    // Si NO es 'MASTER' (comparado en mayúsculas), aplicamos filtro
+                    if (miEmpresa.toUpperCase() !== 'MASTER') {
+                        // .ilike filtra ignorando case ("nike" == "NIKE")
+                        qInc = qInc.ilike('empresa_id', miEmpresa);
+                        qStk = qStk.ilike('empresa_id', miEmpresa);
+                        qTch = qTch.ilike('empresa_id', miEmpresa);
+                        qAgd = qAgd.ilike('empresa_id', miEmpresa);
+                    }
+
+                    // 3. Ejecutar consultas
+                    const [inc, st, tch, agd] = await Promise.all([qInc, qStk, qTch, qAgd]);
+
+                    // 4. Procesar resultados
+                    if(inc.data) {
+                        const overrides = JSON.parse(localStorage.getItem('argos_level_overrides')) || {};
+                        this.rawIncidencias = inc.data.map(row => {
+                            let lvl = 'lvl2'; 
+                            if (overrides[row.id]) lvl = overrides[row.id];
+                            else if(row.resultado && row.resultado.includes('Resuelto')) lvl = 'lvl1';
+                            else if(row.prioridad === 'Crítica') lvl = 'lvl3';
+                            return { ...row, localLevel: lvl };
+                        });
+                        this.recalculateROI();
+                    }
+                    if(st.data) this.stock = st.data;
+                    if(tch.data) this.technicians = tch.data;
+                    if(agd.data) this.events = agd.data;
+                    
+                    this.loading = false;
+                },
+
+                // --- GUARDADO DE DATOS (INYECTANDO EMPRESA) ---
+                async saveStock() {
+                    if(!this.newStock.nombre) return alert("Falta nombre");
+                    const payload = { 
+                        ...this.newStock, 
+                        empresa_id: this.userProfile.empresa_id // Inyectar empresa del usuario
+                    };
+                    delete payload.id;
+                    const promise = this.newStock.id 
+                        ? supabaseClient.from('stock').update(payload).eq('id', this.newStock.id) 
+                        : supabaseClient.from('stock').insert([payload]);
+                    await promise;
+                    this.modals.stock = false; this.reloadData();
+                },
+
+                async saveEvent() {
+                    if(!this.newEvent.cliente_info || !this.currentTech) return;
+                    const d = new Date(this.calendarDate); d.setHours(this.newEvent.hour, 0, 0, 0);
+                    const pl = { 
+                        tecnico_id: this.currentTech.id, 
+                        fecha: d.toISOString(), 
+                        duracion_minutos: 60, 
+                        tipo: this.newEvent.tipo, 
+                        cliente_info: this.newEvent.cliente_info, 
+                        notas: this.newEvent.notas,
+                        empresa_id: this.userProfile.empresa_id // Inyectar empresa
+                    };
+                    await supabaseClient.from('agenda_tecnicos').insert([pl]);
+                    // fetch(N8N_WEBHOOK...) 
+                    this.modals.event = false; this.reloadData();
+                },
+
+                async confirmSmartAssignment() {
+                    if(!this.smartSelection.techId || !this.smartTarget) return;
+                    const btn = document.getElementById('btn-smart-confirm');
+                    btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Procesando...'; btn.disabled = true;
+
+                    const tech = this.technicians.find(t => t.id === this.smartSelection.techId);
+                    const d = new Date(this.smartSelection.date); d.setHours(this.smartSelection.hour, 0, 0, 0);
+                    
+                    const pl = { 
+                        tecnico_id: tech.id, 
+                        fecha: d.toISOString(), 
+                        duracion_minutos: 60, 
+                        tipo: this.smartTarget.localLevel === 'lvl2' ? 'Videoconferencia' : 'Visita Presencial', 
+                        cliente_info: this.smartTarget.cliente_correo, // Usamos correo como ID
+                        notas: `[INCIDENCIA #${this.smartTarget.id}] ${this.smartTarget.incidencia}`,
+                        empresa_id: this.userProfile.empresa_id // Inyectar empresa
+                    };
+
+                    const { error } = await supabaseClient.from('agenda_tecnicos').insert([pl]);
+                    
+                    if(!error) {
+                        const n8nBody = { ...pl, tech_name: tech.nombre_completo, tech_email: tech.email, cliente_email: this.smartTarget.cliente_correo };
+                        fetch(N8N_WEBHOOK, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(n8nBody) }).catch(console.error);
+
+                        this.assignedIncidents.push(this.smartTarget.id);
+                        localStorage.setItem('argos_assigned_ids', JSON.stringify(this.assignedIncidents));
+                        this.modals.smartAssign = false;
+                        this.reloadData();
+                    } else { alert("Error al agendar: " + error.message); }
+                    btn.innerHTML = '<i class="fa-solid fa-calendar-check mr-2"></i> Confirmar Asignación'; btn.disabled = false;
+                },
+
+                // --- HELPERS VISUALES (SIN CAMBIOS) ---
+                getPageTitle() { return { 'dashboard': 'Centro de Control', 'fleet': 'Gestión de Incidencias', 'calendar': 'Agenda', 'stock': 'Almacén' }[this.view]; },
+                getGlobalBotRate() { const total = this.stats.lvl1 + this.stats.lvl2 + this.stats.lvl3; return total === 0 ? 0 : Math.round((this.stats.lvl1 / total) * 100); },
+                getPercentage(val) { const total = this.stats.lvl1 + this.stats.lvl2 + this.stats.lvl3; return total === 0 ? 0 : Math.round((val / total) * 100); },
+                saveOverride(row, el) { const overrides = JSON.parse(localStorage.getItem('argos_level_overrides')) || {}; overrides[row.id] = row.localLevel; localStorage.setItem('argos_level_overrides', JSON.stringify(overrides)); el.classList.add('saved-success'); setTimeout(() => el.classList.remove('saved-success'), 1000); this.recalculateROI(); },
+                openSmartAssign(incident) { this.smartTarget = incident; this.smartSelection = { techId: null, date: new Date().toISOString().split('T')[0], hour: 9 }; this.modals.smartAssign = true; },
+                isAssigned(id) { return this.assignedIncidents.includes(id); },
+                setTimeFilter(filter) { this.timeFilter = filter; this.recalculateROI(); },
+                get filteredIncidencias() {
+                    return this.rawIncidencias.filter(item => {
+                        if (this.searchQuery) { const q = this.searchQuery.toLowerCase(); if (!((item.cliente_correo && item.cliente_correo.toLowerCase().includes(q)) || (item.incidencia && item.incidencia.toLowerCase().includes(q)))) return false; }
+                        if (this.filters.levels.length > 0 && !this.filters.levels.includes(item.localLevel)) return false;
+                        if (this.filters.priorities.length > 0 && !this.filters.priorities.includes(item.prioridad)) return false;
+                        if (this.view === 'dashboard' && this.timeFilter !== 'all') { const d = new Date(item.created_at); const now = new Date(); if(this.timeFilter==='today' && d.getDate()!==now.getDate()) return false; }
+                        return true;
+                    });
+                },
+                get filteredCost() { return this.filteredIncidencias.reduce((acc, row) => acc + (row.localLevel === 'lvl1' ? 0 : (row.localLevel === 'lvl2' ? this.config.costVideo : this.config.costTech)), 0); },
+                get filteredBotRate() { return this.filteredIncidencias.length ? Math.round((this.filteredIncidencias.filter(i => i.localLevel === 'lvl1').length / this.filteredIncidencias.length) * 100) : 0; },
+                resetFilters() { this.searchQuery = ''; this.filters.levels = []; this.filters.priorities = []; },
+                get filteredStock() { return !this.searchQuery ? this.stock : this.stock.filter(s => s.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())); },
+                openStockModal(item) { this.newStock = item ? { ...item } : { id: null, nombre: '', sku: '', price: 0, cantidad_actual: 0, cantidad_minima: 5, foto_url: '' }; this.modals.stock = true; },
+                async uploadImage(e) { const file = e.target.files[0]; if(!file) return; this.uploading = true; const fileName = `prod_${Date.now()}_${file.name.replace(/\s/g, '_')}`; const { error } = await supabaseClient.storage.from('imagenes_stock').upload(fileName, file); if(!error) this.newStock.foto_url = supabaseClient.storage.from('imagenes_stock').getPublicUrl(fileName).data.publicUrl; this.uploading = false; },
+                async deleteStock(id) { if(confirm("¿Borrar?")) { await supabaseClient.from('stock').delete().eq('id', id); this.reloadData(); } },
+                changeDate(d) { const date = new Date(this.calendarDate); date.setDate(date.getDate() + d); this.calendarDate = date.toISOString().split('T')[0]; },
+                getTechLoad(techId) { const evs = this.events.filter(e => e.tecnico_id === techId && e.fecha.startsWith(this.calendarDate)); return Math.min((evs.length / 8) * 100, 100); },
+                getEvents(hour) { if(!this.currentTech) return []; return this.events.filter(e => { const d = new Date(e.fecha); return d.toISOString().startsWith(this.calendarDate) && d.getHours() === hour && e.tecnico_id === this.currentTech.id; }); },
+                openEventModal(h) { this.newEvent = { hour: h, cliente_info: '', tipo: 'Videoconferencia', notas: '' }; this.modals.event = true; },
+                get timeFilterTranslated() { return { 'today': 'Hoy', 'week': 'Esta Semana', 'month': 'Este Mes', 'all': 'Histórico' }[this.timeFilter]; },
+                getRowCost(lvl) { return this.formatCurrency(lvl === 'lvl1' ? 0 : (lvl === 'lvl2' ? this.config.costVideo : this.config.costTech)); },
+                formatCurrency(v) { return new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(v); },
+                saveSettings() { localStorage.setItem('argos_config', JSON.stringify(this.config)); this.recalculateROI(); this.modals.settings = false; },
+                recalculateROI() { let s = { lvl1: 0, lvl2: 0, lvl3: 0, savings: 0 }; const data = this.filteredIncidencias; data.forEach(r => s[r.localLevel]++); const trad = data.length * this.config.costTech; const curr = (s.lvl1 * 0) + (s.lvl2 * this.config.costVideo) + (s.lvl3 * this.config.costTech); s.savings = trad - curr; this.stats = s; this.renderCharts(s, trad, curr); },
+                renderCharts(stats, trad, curr) { if(this.view !== 'dashboard') return; const ctxPie = document.getElementById('efficiencyChart'); if(ctxPie) { if(this.chartInstancePie) this.chartInstancePie.destroy(); this.chartInstancePie = new Chart(ctxPie, { type: 'doughnut', data: { labels: ['Bot', 'Humanos'], datasets: [{ data: [stats.lvl1, stats.lvl2+stats.lvl3], backgroundColor: ['#38bdf8', '#1e293b'], borderWidth: 0 }] }, options: { cutout: '75%', plugins: { legend: { display: false } } } }); } },
+                exportExcel() { const ws = XLSX.utils.json_to_sheet(this.filteredIncidencias.map(r => ({ ID: r.id, Cliente: r.cliente_correo, Incidencia: r.incidencia, Nivel: r.localLevel, Maquina: r.machine_name, Ubicacion: r.ubicacion }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Argos_Data"); XLSX.writeFile(wb, "Argos_Report.xlsx"); }
+            }
+        }
+    </script>
+</body>
+</html>
